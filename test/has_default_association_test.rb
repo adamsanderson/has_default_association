@@ -22,9 +22,13 @@ class Summary < ActiveRecord::Base
 end
 
 class Person < ActiveRecord::Base
+  DEFAULT_BOOK_NAMES = ["First", "Second", "Third"]
   include HasDefaultAssociation
   
   has_many :books
+  has_default_association :books do |person|
+    DEFAULT_BOOK_NAMES.map{|n| Book.new(name: n) }
+  end
 end
 
 
@@ -44,7 +48,7 @@ class HasDefaultAssociationTest < ActiveSupport::TestCase
     assert_kind_of Person, author
   end
   
-  test "supports custom default blocks" do
+  test "builds default models with custom blocks" do
     name = "Writing Plugins For Fun and the Other Thing"
     book = Book.new(name: name)
     
@@ -68,5 +72,14 @@ class HasDefaultAssociationTest < ActiveSupport::TestCase
     
     assert book.author === author
   end
+  
+  test "supports one to many relations with custom block" do
+    person = Person.new
+    
+    default_book_names = person.books.map{|b| b.name}
+    assert_equal Person::DEFAULT_BOOK_NAMES, default_book_names
+  end
+  
+  
   
 end

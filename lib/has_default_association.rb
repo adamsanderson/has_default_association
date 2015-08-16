@@ -21,12 +21,15 @@ module HasDefaultAssociation
     def has_default_association name, &default_proc
       setter = :"#{name}="
       
-      default_proc ||= proc{|model| model.association(name).build }
-
+      default_proc ||= proc do |model| 
+        model.association(name).build
+      end
+      
       define_method(name) do
-        association(name).load_target || begin
-          self.send setter, default_proc.call(self)
-        end
+        target = association(name).load_target
+        return target unless target.blank?
+        
+        self.send setter, default_proc.call(self)
       end
     end
     
