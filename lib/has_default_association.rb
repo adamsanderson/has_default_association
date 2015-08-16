@@ -18,6 +18,11 @@ module HasDefaultAssociation
     #     Address.new(:name => model.full_name)
     #   end
     # 
+    # =Options
+    # 
+    # +eager+ will instantiate a default assocation when a
+    # model is initialized.
+    # 
     def has_default_association *names, &default_proc
       opts = names.extract_options!
       opts.assert_valid_keys(:eager)
@@ -27,6 +32,8 @@ module HasDefaultAssociation
         add_default_association_callback(name) if opts[:eager]
       end
     end
+    
+    alias_method :has_default_associations, :has_default_association 
     
     private
     

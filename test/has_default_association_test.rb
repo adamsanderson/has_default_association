@@ -29,7 +29,7 @@ class Review < ActiveRecord::Base
   belongs_to :book
   belongs_to :person
   
-  has_default_association :book, :person
+  has_default_associations :book, :person
 end
 
 class Person < ActiveRecord::Base

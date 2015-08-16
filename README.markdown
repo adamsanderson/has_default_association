@@ -29,11 +29,26 @@ If no block is passed, HasDefaultAssociation will build a default empty model.
 
 Alternatively a block can be used to build the default associated model.
 
-Caveats
--------
+By default, models are only created on demand.  If you always want the 
+associated model created you can pass in the `:eager` option:
 
-Default models are only created on demand, so in the above example, creating a new
-book object does not immediately create an author.
+~~~ ruby
+  # Always create a default summary
+  has_one :summary
+  has_default_association(:summary, eager: true) do |book|
+    Summary.new(text: "'#{book.name}' is just swell!")
+  end
+~~~
+
+For convenience, more than one default association can be named at once:
+
+~~~ ruby
+  has_one :summary
+  has_one :preface
+  has_default_association :summary, :preface
+~~~
+
+And there you go.  Enjoy by default!
 
 LICENSE:
 --------
