@@ -12,6 +12,8 @@ class Book < ActiveRecord::Base
   has_default_association(:summary) do |book|
     Summary.new(text: "'#{book.name}' is just swell!")
   end
+  
+  has_many :reviews
 end
 
 class Summary < ActiveRecord::Base
@@ -19,6 +21,15 @@ class Summary < ActiveRecord::Base
   
   belongs_to :book
   has_default_association :book
+end
+
+class Review < ActiveRecord::Base
+  include HasDefaultAssociation
+  
+  belongs_to :book
+  belongs_to :person
+  
+  has_default_association :book, :person
 end
 
 class Person < ActiveRecord::Base
@@ -80,6 +91,14 @@ class HasDefaultAssociationTest < ActiveSupport::TestCase
     assert_equal Person::DEFAULT_BOOK_NAMES, default_book_names
   end
   
-  
+  test "multiple relations can be declared at once" do
+    review = Review.new
+
+    book   = review.book
+    person = review.person
+        
+    assert_kind_of Book, book
+    assert_kind_of Person, person
+  end
   
 end

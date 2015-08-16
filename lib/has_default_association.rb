@@ -18,7 +18,15 @@ module HasDefaultAssociation
     #     Address.new(:name => model.full_name)
     #   end
     # 
-    def has_default_association name, &default_proc
+    def has_default_association *names, &default_proc
+      names.each do |name|
+        create_default_association(name, default_proc)
+      end
+    end
+    
+    private
+    
+    def create_default_association name, default_proc
       setter = :"#{name}="
       
       default_proc ||= proc do |model| 
