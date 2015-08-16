@@ -19,8 +19,12 @@ module HasDefaultAssociation
     #   end
     # 
     def has_default_association *names, &default_proc
+      opts = names.extract_options!
+      opts.assert_valid_keys(:eager)
+      
       names.each do |name|
         create_default_association(name, default_proc)
+        add_default_association_callback(name) if opts[:eager]
       end
     end
     
@@ -38,6 +42,12 @@ module HasDefaultAssociation
         return target unless target.blank?
         
         self.send setter, default_proc.call(self)
+      end
+    end
+    
+    def add_default_association_callback name
+      after_initialize do
+        self.send(name) unless persisted?
       end
     end
     

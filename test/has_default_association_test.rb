@@ -9,7 +9,7 @@ class Book < ActiveRecord::Base
   has_default_association(:author)
 
   has_one :summary
-  has_default_association(:summary) do |book|
+  has_default_association(:summary, :eager => true) do |book|
     Summary.new(text: "'#{book.name}' is just swell!")
   end
   
@@ -99,6 +99,29 @@ class HasDefaultAssociationTest < ActiveSupport::TestCase
         
     assert_kind_of Book, book
     assert_kind_of Person, person
+  end
+  
+  test "eagerly instantiates associations" do
+    book = Book.new
+    
+    summary_loaded = book.association(:summary).loaded?
+    assert summary_loaded
+  end
+  
+  test "eager associations are saved" do
+    book = Book.create!
+    summary = book.summary
+    
+    assert summary.persisted?
+  end
+  
+  test "does not eagerly instantiate relations on saved records" do
+    # Create and then find the book so that a fresh object is used.
+    book = Book.create!
+    book = Book.find(book.id)
+    
+    summary_loaded = book.association(:summary).loaded?
+    assert !summary_loaded
   end
   
 end
